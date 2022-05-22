@@ -1,6 +1,10 @@
 const express = require('express');
-
 const app = express();
+
+const jwt = require("jsonwebtoken");
+
+// CONFIG MONGOOSE
+require("./server/config/mongoose.config");
 
 app.get('/', (req, res) => res.send('Hello world!'));
 
