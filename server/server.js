@@ -4,7 +4,7 @@ const app = express();
 const jwt = require("jsonwebtoken");
 
 // CONFIG MONGOOSE
-require("./server/config/mongoose.config");
+require("../server/config/mongoose.config");
 
 app.get('/', (req, res) => res.send('Hello world!'));
 
@@ -184,4 +184,6 @@ io.on("join_room", (socket) => {
 
     socket.join(user.room);
     console.log(`${user.userName} joined room: `, user.room);
+
+
 })
