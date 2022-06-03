@@ -185,5 +185,14 @@ io.on("join_room", (socket) => {
     socket.join(user.room);
     console.log(`${user.userName} joined room: `, user.room);
 
+    socket.broadcast.to(user.room).emit("message from the server", {
+        message: `${user.userName} has joined this room`,
+        timeStamp: getTimeStamp(),
+    });
+    if (messageObj.filter((msg) => msg.room === room)) {
+        const getThisRoomMessages = (room) => messageObj.filter((m) => m.room === room);
+        const newUserRoomMessage = getThisRoomMessages(user.room);
 
+        io.to(user.room).emit("Welcome and thank you for using this chat! Here is your data", newUserRoomMessage);
+    }
 })
