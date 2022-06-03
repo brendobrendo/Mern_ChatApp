@@ -162,5 +162,26 @@ const timeStamp = () => {
 const newEmoj = () => {
     let randomIdx = Math.floor(Math.random() * emjos.length);
     let newUserEmoji = emjos[randomIdx];
-    return newUserEmoji;e
+    return newUserEmoji;
 }
+
+//socket transactions
+
+io.on("join_room", (socket) => {
+    console.log("A client connected: ", socket.id);
+
+    socket.io("join_room", ({room, userName}) => {
+        const user = {
+            id: socket.id,
+            userName: userName,
+            room: room,
+            emoji: newEmoj()
+        }
+    })
+
+    console.log('user', user);
+    userObj.push(user);
+
+    socket.join(user.room);
+    console.log(`${user.userName} joined room: `, user.room);
+})
