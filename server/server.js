@@ -19,7 +19,7 @@ let userObj = [];
 let messageObj = [];
 
 
-let emjos = [
+let emoji = [
     '🙈',
     '🙉', 
     '🙊', 
@@ -160,8 +160,8 @@ const timeStamp = () => {
 }
 
 const newEmoj = () => {
-    let randomIdx = Math.floor(Math.random() * emjos.length);
-    let newUserEmoji = emjos[randomIdx];
+    let randomIdx = Math.floor(Math.random() * emoji.length);
+    let newUserEmoji = emoji[randomIdx];
     return newUserEmoji;
 }
 
@@ -195,4 +195,57 @@ io.on("join_room", (socket) => {
 
         io.to(user.room).emit("Welcome and thank you for using this chat! Here is your data", newUserRoomMessage);
     }
-})
+
+    const getUsersFromRoom = (room) => userObj.filter((user) => user.room === room);
+    io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getUsersFromRoom(user.room)
+    })
+
+    //server listens for this event 
+    socket.on("event-from client", ({room, content: {userName, newMessage}}) => {
+        const findUserEmoji = (userName) => {
+            let userEmoji = userObj.find((u) => u.userName === userName).emoji;
+            return userEmoji;
+        } 
+        //server messages to All Users/Rooms 
+        messageObj.push({
+            room: room,
+            userName: userName,
+            message: newMessage,
+            cliend_id: socket.id,
+            emoji: findUserEmoji(userName),
+            timestamp: timeStamp()
+        })
+
+        //messages to new clients 
+        let newMessageSentToClient = {
+            userName: userName,
+            message: newMessage,
+            client_id: socket.id,
+            emoji: findUserEmoji(userName),
+            timeStamp: timeStamp()
+        }
+
+        //send specific messages to a specific room 
+        io.to(room).emit("recieve_messsage", newMessageSentToClient);
+    })
+
+    socket.on("discconet", () => {
+        console.log("User has disconnected", socket.id);
+        const msgToDisconnectUser = (id) => {
+            const idx = userObj.findIndex((user) => user.id === id);
+            if (idx !== -1) {
+                return userObj.splice(idx, 1)[0];
+            }
+        };
+
+        const user = msgToDisconnectUser(socket.id);
+        if (user) {
+            io.to(user.room).emit("roomUsers", {
+                room: user.room,
+                users: getUsersFromRoom(user.room)
+            });
+        }
+    });
+});
