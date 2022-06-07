@@ -25,6 +25,19 @@ function App() {
 
   //client message 
   const [newMessage, setNewMessage] = useState("");
+
+  //functions
+
+  const loginHandler = (e) => {
+    e.preventDefault();
+    if (!userName || userName.trim() === "" || userName.trim().length < 4 || userName.trim().length > 10 || userName === "" || userNameError) {
+      return; 
+    } else {
+      setUserLoggedIn(true);
+      setRoom(selectedRoom);
+      socket.emit("join_room", {room: selectedRoom, userName});
+      }
+  }
   
   return (
     <div className="App">
