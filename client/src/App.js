@@ -13,6 +13,18 @@ function App() {
   
   const [usersConnected, setUsersConnected] = useState([]);
   const [roomConnected, setRoomCOnnected] = useState("");
+
+  const [dataArrObj_from_server, setDataArrObj_from_server] = useState([
+    {
+      userName: "",
+      emoji: "🌈",
+      message: "Welcome to the chat room",
+      dateSent: "...."
+    },
+  ]);
+
+  //client message 
+  const [newMessage, setNewMessage] = useState("");
   
   return (
     <div className="App">
