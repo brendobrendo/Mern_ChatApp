@@ -1,7 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
+import {useState, useEffect, useRef} from "react";
+import io from "socket.io-client";
 
 function App() {
+  const [socket] = useState(() => io(":1337"));
+
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userNameError, setUserNameError] = useState("");
+  const [room, setRoom] = useState("");
+  
+  const [usersConnected, setUsersConnected] = useState([]);
+  const [roomConnected, setRoomCOnnected] = useState("");
+  
   return (
     <div className="App">
       <header className="App-header">
