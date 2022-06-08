@@ -12,7 +12,7 @@ function App() {
   const [room, setRoom] = useState("");
   
   const [usersConnected, setUsersConnected] = useState([]);
-  const [roomConnected, setRoomCOnnected] = useState("");
+  const [roomConnected, setRoomConnected] = useState("");
 
   const [dataArrObj_from_server, setDataArrObj_from_server] = useState([
     {
@@ -38,6 +38,60 @@ function App() {
       socket.emit("join_room", {room: selectedRoom, userName});
       }
   }
+
+  useEffect(() => {
+    //get all data upon login 
+
+    socket.io("from server- here is your data", (all_messages) => {
+      //set and display all messages when user logs in
+      setDataArrObj_from_server((previousData) => {
+        return [...previousData, all_messages];
+      })
+    })
+
+    socket.io('greetings from server', ({message, timeStamp}) => {
+      setDataArrObj_from_server((previousData) => {
+        console.log('somone joined > previous Data = ', previousData);
+        return [
+          ...previousData,
+          {
+            userName: "",
+            emoji: "🐒 ",
+            message: message,
+            timeStamp: timeStamp
+          },
+        ];
+      });
+    });
+
+    socket.prependAny('roomUsers', ({room, users}) => {
+      console.log(`we are in room: ${room}`);
+      console.log(`users connected to ${room} = ${users}`);
+      setRoomConnected(room);
+      setUsersConnected(users);
+    });
+
+    socket.on("disconnected_user", ({user, timeStamp, emoji}) => {
+      console.log(`user: ${user} disconnected`);
+      setDataArrObj_from_server((previousStateData) => {
+        return [...previousStateData,
+        {
+          client_id: "",
+          timeStamp,
+          emoji: "❌",
+          message: `${user} ${emoji} has left the room`,
+          userName: ""
+        },
+      ];
+      });
+    });
+    //update chat from others
+    socket.on("recieve message", (datArr) => {
+      setDataArrObj_from_server((previousStateData) => {
+        return [...previousStateData, datArr];
+      });
+    });
+  });
   
   return (
     <div className="App">
