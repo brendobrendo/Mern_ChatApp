@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-mongoose.connect('mongodb://localhost/chatroomdb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-    .then(()=> console.log("Connection has been establised with database"))
-    .catch(err => console.log(err, "Error alert!"))
+module.exports = db_name => {
+    mongoose
+    .connect(`mongodb://localhost/${db_name}`)
+    .then(() => console.log(`Successfully connected to ${db_name}`))
+    .catch(err => console.log("mongoose connection failed: ", err));
+};

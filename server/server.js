@@ -1,251 +1,79 @@
+// IMPORT PACKAGES
 const express = require('express');
 const app = express();
-
+const cors = require('cors')
+require('dotenv').config()
 const jwt = require("jsonwebtoken");
+const cookieParser = require('cookie-parser');
+
 
 // CONFIG MONGOOSE
-require("../server/config/mongoose.config");
+require("./config/mongoose.config");
 
-app.get('/', (req, res) => res.send('Hello world!'));
+// CONFIG EXPRESS
+// app.use(cors()) // Having 2 localhost port to communicate
+app.use(cors({
+    credentials: true, 
+    origin: 'http://localhost:3000'
+}));
+app.use(express.json())  // POST METHOD
+app.use(cookieParser());
+// Change the app.use(cors()) to the one below
 
-const port = process.env.PORT || 8082;
+// ROUTES
+require("./routes/user.routes")(app)
 
-const server = app.listen(port, () => console.log(`Server running on port ${port}`));
+// PORT
+const server = app.listen(8000, () => console.log(`Listening on port: 8000`) );
 
-const sockets = require("socket.io");
-const io = sockets(server, {cors: true});
-
-let userObj = [];
-let messageObj = [];
-
-
-let emoji = [
-    '🙈',
-    '🙉', 
-    '🙊', 
-    '💥', 
-    '💫', 
-    '💦', 
-    '💨', 
-    '🐵', 
-    '🐒', 
-    '🦍', 
-    '🦧', 
-    '🐶', 
-    '🐕', 
-    '🦮', 
-    '🐕‍🦺', 
-    '🐩', 
-    '🐺', 
-    '🦊', 
-    '🦝', 
-    '🐱',
-    '🐈',
-    '🐈‍',
-    '🦁',
-    '🐯',
-    '🐅',
-    '🐆',
-    '🐴',
-    '🐎',
-    '🦄',
-    '🦓', 
-    '🦌', 
-    '🐮',
-    '🐂', 
-    '🐃',
-    '🐄', 
-    '🐷',
-    '🐖',
-    '🐗',
-    '🐽',
-    '🐏',
-    '🐑',
-    '🐐',
-    '🐪',
-    '🐫',
-    '🦙',
-    '🦒',
-    '🐘',
-    '🦏',
-    '🦛',
-    '🐭',
-    '🐁',
-    '🐀',
-    '🐹',
-    '🐰',
-    '🐇',
-    '🐿️',
-    '🦔',
-    '🦇', 
-    '🐻',
-    '🐼',
-    '🦥',
-    '🦘',
-    '🦡',
-    '🦃', 
-    '🐔',
-    '🐤',
-    '🐦', 
-    '🐧', 
-    '🦅',
-    '🦆',
-    '🦢', 
-    '🦉',
-    '🦩',
-    '🦜',
-    '🐸',
-    '🐊',
-    '🐢',
-    '🦎',
-    '🐍',
-    '🐉',
-    '🐋',
-    '🐬',
-    '🐟',
-    '🐠',
-    '🐡',
-    '🦈',
-    '🐚',
-    '🦋',
-    '🐝',
-    '🐞',
-    '🕷️',
-    '🌸',
-    '🌹', 
-    '🌺', 
-    '🌻',
-    '🌷', 
-    '🌴',
-    '🌵',
-    '☘️',
-    '🍀',
-    '🍂',
-    '🍄',
-    '🌰',
-    '🦞',
-    '🌙',
-    '☀️',
-    '🌝',
-    '🌟',
-    '🌠',
-    '⛅',
-    '⛈️',
-    '🌤️',
-    '🌈',
-    '☂️',
-    '⚡',
-    '❄️',
-    '☃️', 
-    '⛄', 
-    '☄️', 
-    '🔥',
-    '💧',
-    '🌊', 
-    '🎄',
-    '✨', 
-    '🎋', 
-    '🎍'
-];
+const io = require('socket.io')(server, { cors: true });
 
 
-//time stamp
-const timeStamp = () => {
-    let date = new Date();
-    const hour = date.getHours();
-    const minute  = date.getMinutes();
-    const seconds = date.getSeconds();
-    let currentDate = `${hour}: ${minute}: ${seconds}`;
-    return currentDate;
-}
+io.on("connection", socket => {
 
-const newEmoj = () => {
-    let randomIdx = Math.floor(Math.random() * emoji.length);
-    let newUserEmoji = emoji[randomIdx];
-    return newUserEmoji;
-}
+    console.log(socket.id);
+    
+    
+    // listen for a client event
+    
+    socket.on("General Chat", (client_input) => {
+    
+    console.log("you got mail", client_input);
+    
+    
+    // emit this back to the client / everyone
+    
+    io.emit('message sent', client_input)
+    
+    }),
+    
+    
+    
+    // listen for a client event
+    
+    socket.on("let's game!", (client_input) => {
+    
+    console.log("you got mail", client_input);
+    
+    
+    // emit this back to the client / everyone
+    
+    io.emit('game chat wrap up', client_input)
+    
+    }),
 
-//socket transactions
-
-io.on("join_room", (socket) => {
-    console.log("A client connected: ", socket.id);
-
-    socket.io("join_room", ({room, userName}) => {
-        const user = {
-            id: socket.id,
-            userName: userName,
-            room: room,
-            emoji: newEmoj()
-        }
-    })
-
-    console.log('user', user);
-    userObj.push(user);
-
-    socket.join(user.room);
-    console.log(`${user.userName} joined room: `, user.room);
-
-    socket.broadcast.to(user.room).emit("message from the server", {
-        message: `${user.userName} has joined this room`,
-        timeStamp: getTimeStamp(),
-    });
-    if (messageObj.filter((msg) => msg.room === room)) {
-        const getThisRoomMessages = (room) => messageObj.filter((m) => m.room === room);
-        const newUserRoomMessage = getThisRoomMessages(user.room);
-
-        io.to(user.room).emit("Welcome and thank you for using this chat! Here is your data", newUserRoomMessage);
-    }
-
-    const getUsersFromRoom = (room) => userObj.filter((user) => user.room === room);
-    io.to(user.room).emit("roomUsers", {
-        room: user.room,
-        users: getUsersFromRoom(user.room)
-    })
-
-    //server listens for this event 
-    socket.on("event-from client", ({room, content: {userName, newMessage}}) => {
-        const findUserEmoji = (userName) => {
-            let userEmoji = userObj.find((u) => u.userName === userName).emoji;
-            return userEmoji;
-        } 
-        //server messages to All Users/Rooms 
-        messageObj.push({
-            room: room,
-            userName: userName,
-            message: newMessage,
-            cliend_id: socket.id,
-            emoji: findUserEmoji(userName),
-            timestamp: timeStamp()
+    // listen for a client event
+    
+    socket.on("anime time", (client_input) => {
+    
+        console.log("message to anime fans", client_input);
+        
+        
+        // emit this back to the client / everyone
+        
+        io.emit('anime dicussion', client_input)
+        
         })
 
-        //messages to new clients 
-        let newMessageSentToClient = {
-            userName: userName,
-            message: newMessage,
-            client_id: socket.id,
-            emoji: findUserEmoji(userName),
-            timeStamp: timeStamp()
-        }
 
-        //send specific messages to a specific room 
-        io.to(room).emit("recieve_messsage", newMessageSentToClient);
-    })
-
-    socket.on("discconet", () => {
-        console.log("User has disconnected", socket.id);
-        const msgToDisconnectUser = (id) => {
-            const idx = userObj.findIndex((user) => user.id === id);
-            if (idx !== -1) {
-                return userObj.splice(idx, 1)[0];
-            }
-        };
-
-        const user = msgToDisconnectUser(socket.id);
-        if (user) {
-            io.to(user.room).emit("roomUsers", {
-                room: user.room,
-                users: getUsersFromRoom(user.room)
-            });
-        }
-    });
 });
