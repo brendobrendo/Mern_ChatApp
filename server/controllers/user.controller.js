@@ -4,79 +4,95 @@ const jwt = require("jsonwebtoken");
 
 // export an object that is full of methods
 module.exports = {
-  register(req, res) {
-    const user = new User(req.body);
+  signup: async (req, res) => {
+    console.log('here');
+      const user = req.body;
 
-    user
-      .save()
-      .then(() => {
-        res.json({ msg: "success!", user: user });
-      })
-      .catch((err) => res.status(400).json(err));
+      const usernameTaken = await User.findOne({username : user.username});
+      const emailTaken = await User.findOne({email : user.email});
+
+      if(usernameTaken || emailTaken) {
+          res.json({message: "Username or email is taken"});
+      } else if (user.password != user.confirmPassword) {
+          res.json({message: "Passwords do not match."})
+      } else {
+          user.password = await bcrypt.hash(req.body.password, 10);
+          const dbUser = new User({
+              username: user.username.toLowerCase(),
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email.toLowerCase(),
+              password: user.password,
+          })
+
+          dbUser.save();
+          res.json({message: "PogO"});
+      }
   },
 
-  login(req, res) {
-    User.findOne({ email: req.body.email })
-      .then((user) => {
-        if (user === null) {
-          res.status(400).json({ msg: "invalid login attempt" });
-        } else {
-          bcrypt
-            .compare(req.body.password, user.password)
-            .then((passwordIsValid) => {
-              if (passwordIsValid) {
-                res
-                  .cookie(
-                    "usertoken",
-                    jwt.sign({ _id: user._id }, process.env.JWT_SECRET),
-                    {
-                      httpOnly: true,
-                    }
-                  )
-                  .json({ msg: "success!" });
-              } else {
-                res.status(400).json({ msg: "invalid login attempt" });
-              }
-            })
-            .catch((err) =>
-              res.status(400).json({ msg: "invalid login attempt" })
-            );
+
+  login: (req , res) => {
+    const userLoggingIn = req.body;
+
+    console.log("logging in");
+
+    User.findOne({username: userLoggingIn.username})
+    .then(dbUser => {
+        if (!dbUser) {
+            return res.json({message: "Invalid Username or Password!"});
         }
-      })
-      .catch((err) => res.json(err));
-  },
+        bcrypt.compare(userLoggingIn.password, dbUser.password)
+        .then(auth => {
+            if(auth) {
+                const payload = {
+                    id: dbUser._id,
+                    username: dbUser.username
+                }
+                jwt.sign(
+                    payload,
+                    process.env.JWT_SECRET,
+                    {expiresIn: 86400},
+                    (err,token) => {
+                        if(err) {
+                            return res.json({message: err})
+                        } else {
+                            return res.json({message: "Success", token: "Bearer " + token})
+                        }
+                    }
+                )
+            } else {
+                return res.json({message : "Invalid Username or Password!"})
+            }
+        })
+    })
+},
 
-  logout(req, res) {
-    res
-      .cookie("usertoken", jwt.sign({ _id: "" }, process.env.JWT_SECRET), {
-        httpOnly: true,
-        maxAge: 0,
-      })
-      .json({ msg: "ok" });
-  },
+  logoff: (req, res) => {
+    res.json({message : "Loggedoff", token: ""})
+},
 
-  logout2(req, res) {
-    res.clearCookie("usertoken");
-    res.json({ msg: "usertoken cookie cleared" });
-  },
+isUserAuth: (req, res) => {
+    return res.json({isLoggedIn : true, username : req.user.username})
+},
 
-  getLoggedInUser(req, res) {
-    const decodedJWT = jwt.decode(req.cookies.usertoken, { complete: true });
+verifyJWT(req, res, next) {
+    const token = req.headers["x-access-token"]?.split(' ')[1];
 
-    User.findById(decodedJWT.payload._id)
-      .then((user) => res.json(user))
-      .catch((err) => res.json(err));
-  },
-
-  getAll(req, res) {
-    User.find()
-      .then((users) => res.json(users))
-      .catch((err) => res.json(err));
-  },
-
-  getOne(req, res) {
-    User.findOne({ _id: req.params.id })
-        .then((user) => res.json(user))
-        .catch((err) => res.json(err));
-  },
+    if(token) {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if(err) {
+                return res.json({
+                    isLoggedIn: false,
+                    message: "Failed to authenticate."
+                })
+            }
+            req.user = {};
+            req.user.id = decoded.id;
+            req.user.username = decoded.username;
+            next();
+        })
+    } else {
+        return res.json({message: "Incorrect Token Given", isLoggedIn: false});
+    }
+}
 };

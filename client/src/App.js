@@ -1,15 +1,10 @@
-import React, { useState } from "react";
-import './App.css';
-import LogReg from "./views/LogReg";
-import UserList from "./views/UserList";
-import axios from "axios";
+
+import Register from "./views/Register";
+import Login from "./views/Login";
 import {
-  Link,
-  Switch,
-  Route,
-  Redirect,
-  useHistory,
-  BrowserRouter
+  BrowserRouter,
+  Routes,
+  Route
 } from "react-router-dom";
 import Main from './views/Main';
 import Chat1 from './views/Chat1';
@@ -17,60 +12,28 @@ import Chat2 from './views/Chat2';
 import Chat3 from './views/Chat3';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const history = useHistory();
-
-  const logout = () => {
-    axios
-      .post(
-        "http://localhost:8000/api/logout",
-        {},
-        {
-          // need to send the cookie in request so server can clear it
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        console.log(res);
-        setIsLoggedIn(false);
-      })
-      .catch(console.log);
-
-    history.push("/");
-  };
-
   return (
-    <>
-      <div className="App">
-        <BrowserRouter>
-          <Switch>
-            {/* route long to short */}
-            {/* <Routes> */}
-            {/* <h1>Welcome to the Chat App!</h1> */}
-            {isLoggedIn && <button onClick={logout}>Logout</button>}
-            <Route>
-              <LogReg setLoggedIn={() => setIsLoggedIn(true)} path="/" />
-              <UserList path="/users"/>
-            </Route>
-            <Link to="/users">Get Users List</Link>
+    <BrowserRouter>
+      <Routes>
+          {/* route long to short */}
+          {/* <Routes> */}
 
-            <Route path="/main">
-              <Main />
-            </Route>
-            <Route exact path={"/login"} >
-              <LogReg />
-            </Route>
-            <Route exact path={"/logout"} >
-              <LogReg />
-            </Route>
-            {/* <Route exact path={"/"}>
-              <Redirect to="/home" />
-            </Route> */}
-            {/* </Routes> */}
-          </Switch>
-        </BrowserRouter>  
-      </div>
-    </>
+          <Route path="/home/" element={<Main />} /> 
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Login />} />  
+          {/* <Route path= "/register">
+            <Register />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/logout">
+            <Login />
+          </Route> */}
+          {/* </Routes> */}
+      </Routes>
+  </BrowserRouter>
   );
 }
 
