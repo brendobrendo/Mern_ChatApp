@@ -23,17 +23,12 @@ const Main = (props) => {
 
 
     return (
-        <div>
-                <div className='topbar'>
-                    <h1>Home Page</h1>
-                    <div className='topRight'>
-                        <button className='btn btn-info btn-outline-dark'><Link to="/home">Home</Link></button>
-                        <button className='btn btn-info btn-outline-dark'>
-                            <Link to="/logOut">Log Out</Link>
-                        </button>
-                </div>
-            </div>
-        </div>
+        <>
+        <h1>Home Page</h1>
+            <button>
+                <Link to="/logOut">Log Out</Link>
+            </button>
+        </>
     )
 }
 

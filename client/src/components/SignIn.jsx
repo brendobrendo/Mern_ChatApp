@@ -22,7 +22,7 @@ const SignIn = ({ setLoggedIn }) => {
       .then((res) => {
         console.log(res);
         setLoggedIn();
-        history.push("/users");
+        history.push("/main");
       })
       .catch((err) => {
         console.log(err);

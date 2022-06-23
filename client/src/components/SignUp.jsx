@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 const SignUp = (props) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState(null);
+
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [errors, setErrors] = useState(null);
+    const history = useHistory();
 
   const register = (event) => {
     event.preventDefault();
@@ -24,6 +27,7 @@ const SignUp = (props) => {
         setEmail("");
         setPassword("");
         setConfirmPassword("");
+        history.push("/main");
       })
       .catch((err) => {
         console.log(err);

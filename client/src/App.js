@@ -50,11 +50,11 @@ function App() {
             {isLoggedIn && <button onClick={logout}>Logout</button>}
             <Route>
               <LogReg setLoggedIn={() => setIsLoggedIn(true)} path="/" />
-              <UserList path="/users" />
+              <UserList path="/users"/>
             </Route>
             <Link to="/users">Get Users List</Link>
 
-            <Route path="/home">
+            <Route path="/main">
               <Main />
             </Route>
             <Route exact path={"/login"} >
@@ -63,9 +63,9 @@ function App() {
             <Route exact path={"/logout"} >
               <LogReg />
             </Route>
-            <Route exact path={"/"}>
+            {/* <Route exact path={"/"}>
               <Redirect to="/home" />
-            </Route>
+            </Route> */}
             {/* </Routes> */}
           </Switch>
         </BrowserRouter>  
