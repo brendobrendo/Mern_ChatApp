@@ -41,10 +41,9 @@ function App() {
           <LogReg />
         </Route>
         <Route exact path={"/profile"} >
-          <Redirect to="/projects" />
         </Route>
         <Route exact path={"/"}>
-          <Redirect to="/projects" />
+          <Redirect to="/profile" />
         </Route>
         {/* </Routes> */}
       </Switch>
