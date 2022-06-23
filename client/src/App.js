@@ -40,35 +40,37 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Switch>
-          {/* route long to short */}
-          {/* <Routes> */}
-          <h1>Welcome to the Chat App!</h1>
-          {isLoggedIn && <button onClick={logout}>Logout</button>}
-          <Route>
-            <LogReg setLoggedIn={() => setIsLoggedIn(true)} path="/" />
-            <UserList path="/users" />
-          </Route>
-          <Link to="/users">Get Users List</Link>
+    <>
+      <div className="App">
+        <BrowserRouter>
+          <Switch>
+            {/* route long to short */}
+            {/* <Routes> */}
+            {/* <h1>Welcome to the Chat App!</h1> */}
+            {isLoggedIn && <button onClick={logout}>Logout</button>}
+            <Route>
+              <LogReg setLoggedIn={() => setIsLoggedIn(true)} path="/" />
+              <UserList path="/users" />
+            </Route>
+            <Link to="/users">Get Users List</Link>
 
-          <Route path="/home">
-            <Main />
-          </Route>
-          <Route exact path={"/login"} >
-            <LogReg />
-          </Route>
-          <Route exact path={"/logout"} >
-            <LogReg />
-          </Route>
-          <Route exact path={"/"}>
-            <Redirect to="/home" />
-          </Route>
-          {/* </Routes> */}
-        </Switch>
-      </BrowserRouter>  
-    </div>
+            <Route path="/home">
+              <Main />
+            </Route>
+            <Route exact path={"/login"} >
+              <LogReg />
+            </Route>
+            <Route exact path={"/logout"} >
+              <LogReg />
+            </Route>
+            <Route exact path={"/"}>
+              <Redirect to="/home" />
+            </Route>
+            {/* </Routes> */}
+          </Switch>
+        </BrowserRouter>  
+      </div>
+    </>
   );
 }
 
