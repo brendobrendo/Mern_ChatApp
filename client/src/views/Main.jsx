@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useHistory } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.css';
 
 const Main = (props) => {
 
@@ -28,7 +27,7 @@ const Main = (props) => {
                 <div className='topbar'>
                     <h1>Home Page</h1>
                     <div className='topRight'>
-                        <button className='btn btn-info btn-outline-dark'><Link to="/profile">Home</Link></button>
+                        <button className='btn btn-info btn-outline-dark'><Link to="/home">Home</Link></button>
                         <button className='btn btn-info btn-outline-dark'>
                             <Link to="/logOut">Log Out</Link>
                         </button>
