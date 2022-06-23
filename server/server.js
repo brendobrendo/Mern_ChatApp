@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 
 
 // CONFIG MONGOOSE
-require("./config/mongoose.config");
+require("./config/mongoose.config")(process.env.DB_NAME);
 
 // CONFIG EXPRESS
 // app.use(cors()) // Having 2 localhost port to communicate
