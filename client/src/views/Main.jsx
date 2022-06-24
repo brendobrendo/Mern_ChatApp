@@ -17,7 +17,7 @@ const Main = (props) => {
             .then(data => {
                 setUser(data.username)
                 console.log("User Auth response", data)
-                return data.isLoggedIn ? null : navigate("/login")
+                return data.isLoggedIn ? null : navigate("/home/")
             })
     }, []);
 
@@ -26,7 +26,7 @@ const Main = (props) => {
         <>
         <h1>Home Page</h1>
             <button>
-                <Link to="logout">Log Out</Link>
+                <a href="/logOut">Log Out</a>
             </button>
         </>
     )

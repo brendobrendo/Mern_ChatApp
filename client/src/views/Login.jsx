@@ -23,8 +23,8 @@ export function Login() {
             .then(data => {
                 localStorage.setItem("token", data.token)
                 console.log("Logged In successfully")
-                navigate("/home/");
             })
+            .then(navigate("/home/"))
             // .then(history.push("/home/"))
             .catch(error => (console.log(error)))
         // .then(history.push("/profile"))
@@ -38,7 +38,7 @@ export function Login() {
             }
         })
             .then(res => res.json())
-            .then(data => data.isLoggedIn ? navigate("/") : null)
+            .then(data => data.isLoggedIn ? navigate("/home/") : null)
     }, [])
 
     return (

@@ -24,6 +24,7 @@ export function Register() {
             },
             body: JSON.stringify(user)
         })
+          navigate("/home/");
     }
 
     useEffect(() => {
