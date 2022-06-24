@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 
-const Chat = () => {
+const Chat1 = () => {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([])
     const [chatName, setChatName] = useState("")
@@ -19,8 +19,8 @@ const Chat = () => {
 
     useEffect(() => {
         // listen from server
-        socket.on("post chat", (msg) => {
-
+        console.log('is this running?');
+        socket.on("Welcome", (msg) => {
             setMessages(prevMsgState => [...prevMsgState, msg])
         })
 
@@ -50,7 +50,7 @@ const Chat = () => {
                         <button className="btn btn-primary ms-2 mb-2"> Enter chat</button>
                     </form> :
                     <>
-                        <form class onSubmit={onSubmitHandler}>
+                        <form onSubmit={onSubmitHandler}>
                             <input type="text" name='msg' onChange={(e) => setInput(e.target.value)} value={input} />
                             <button className="btn btn-primary ms-2 mb-2">Send</button>
                         </form>
@@ -60,4 +60,4 @@ const Chat = () => {
     );
 }
 
-export default Chat;
+export default Chat1;
